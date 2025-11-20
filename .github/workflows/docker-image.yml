@@ -18,21 +18,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Set version environment variable
         run: echo "VERSION=$(git describe --always --tags)" >> $GITHUB_ENV
 
-      - name: Build Docker image using Makefile
-        run: make image
-
-      - name: Retag image for GitHub Container Registry
-        run: |
-          docker tag mcsmons:${{ env.VERSION }} ghcr.io/${{ github.repository_owner }}/mcsmons:${{ env.VERSION }}
+      - name: Generate version.py
+        run: make version.py
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push the Docker image
-        run: docker push ghcr.io/${{ github.repository_owner }}/mcsmons:${{ env.VERSION }}
+      - name: Build and push multi-platform Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/mcsmons:${{ env.VERSION }}
