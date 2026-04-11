@@ -1,3 +1,4 @@
+import json
 import os
 
 from flask import Flask, make_response
@@ -8,7 +9,11 @@ import version
 app = Flask(__name__)
 
 counter = 0
-server_list = [x.strip() for x in os.getenv('MC_SERVER_LIST', 'localhost').split(',')]
+
+_json_path = os.getenv('MC_SERVER_JSON', 'server.json')
+with open(_json_path, 'r') as _f:
+    _config = json.load(_f)
+server_list = [str(s) for s in _config.get('servers', [])]
 
 
 @app.route('/')

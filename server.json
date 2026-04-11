@@ -1,0 +1,8 @@
+{
+  "servers": [
+    "localhost",
+    "mc.example.com:25565",
+    "another-server.example.com:19132"
+  ]
+}
+
