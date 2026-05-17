@@ -38,6 +38,9 @@ def metrics():
         except TimeoutError as e:
             print(f'Minecraft server error: {e}')
             ans += 'server_online{server_name="%s"} %s\n' % (server_name, 0)
+        except OSError as e:
+            print(f'Minecraft server error: {e}')
+            ans += 'server_online{server_name="%s"} %s\n' % (server_name, 0)
         else:
             ans += 'server_online{server_name="%s"} %s\n' % (server_name, 1)
             # since JavaStatusResponse is different for Minecraft Forge Servers we need a hack to get the description
